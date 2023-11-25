@@ -1,23 +1,27 @@
-# NetProxy Package for U++
+# Пакет NetProxy для U++/DinrusIDE
 
-This package implements a client-side network proxy class, encapsulating two widely used network proxy protocols: HTTP tunneling and SOCKS
+Этот пакет реализует клиентскую сторону класса сетевого прокси, инкапсулируя два широко используемых протокола для сетевых прокси: туннелирование HTTP и SOCKS
 
-## Features and Highlights
+## Осбобенности пакета
 
-- Uses `HTTP_CONNECT` method for http tunneling.
-- Encapsulates SOCKS proxy protocol version 4/4a, and version 5, as defined in RFC 1928 and RFC 1929. 
-- In SOCKS mode, NetProxy can work with both IPv4 and IPv6 address families.
-- In SOCKS mode, NetProxy allows BIND requests.
-- In SOCKS mode, NetProxy allows remote name lookups (DNS).
-- Supports both synchronous and asynchronous operation modes.
-- Allows SSL connections to the target machine (not to proxy itself) in both Http and SOCKS modes.
-- Package comes with full public API document for Topic++, and has a typical BSD license.
+- Использует метод `HTTP_CONNECT` для http-туннелирования.
+- Инкапсулирует протокол прокси SOCKS версии 4/4a, и версии 5, определённые в RFC 1928 и RFC 1929. 
+- В режиме SOCKS, NetProxy может работать как с семейством адресов IPv4, так и с IPv6.
+- В режиме SOCKS, NetProxy допускает выполнение запросов BIND.
+- В режиме SOCKS, NetProxy допускает выполнение поисков удалённых имён (DNS).
+- Поддерживает как синхронный, так и асинхронный, режимы выполнения.
+- Поддерживает подключения SSL к целевой машине (не к самому прокси) как в режиме Http, так и в SOCKS.
+- У пакета полностью документирован публичный ИПП (API) в Тематика++, и типичная лицензия BSD.
 
-## Examples
+## Примеры
 
-Two examples are provided with the package.
+С пакетом поставляется два примера.
 
-|**Name**             | **Description**                                                             |
+|**Имя**             | **Описание    **                                                             |
 |:---                 |:---                                                                         |
-| SocksProxyExample   | Demonstrates a simple, blocking `SOCKS5` connection to a target machine.    |
-| SocksProxtExampleNB | Demonstrates a simple, non-blocking `SOCKS5` connection to a target machine |
+| SocksProxyExample   | Демонстрирует простое, блокируемое подключение `SOCKS5` к целевой машине.   |
+| SocksProxtExampleNB | Демонстрирует простое, неблокируемое подключение `SOCKS5`к целевой машине   |
+
+## Сайт автора
+
+https://github.com/ismail-yilmaz/NetProxy
