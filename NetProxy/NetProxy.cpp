@@ -6,35 +6,35 @@ const char* NetProxy::GetMsg(int code)
 {
 	static const Tuple<int, const char*> errors[] = {
 		// NetProxy error messages.
-		{ 10000,	t_("No client to serve (No socket attached).") },
-		{ 10001,	t_("Proxy address or port not specified.") },
-		{ 10002,	t_("Target address or port not specified.") },
-		{ 10003,	t_("Couldn't resolve address.") },
-		{ 10004,	t_("Couldn't connect to proxy server.") },
-		{ 10005,	t_("Couldn't start SSL negotioation.") },
-		{ 10006,	t_("Invalid packet received.") },
-		{ 10007,	t_("Socket error occured.") },
-		{ 10008,	t_("Operation was aborted.") },
-		{ 10009,	t_("Connection timed out.") },
+		{ 10000,	t_("Отсутствует обслуживаемый клиент (не прикреплён сокет).") },
+		{ 10001,	t_("Не указан адрес или порт прокси.") },
+		{ 10002,	t_("Целевой адрес или порт не указан.") },
+		{ 10003,	t_("Не удалось разрешить адрес.") },
+		{ 10004,	t_("Не удалось подключиться к прокси-серверу.") },
+		{ 10005,	t_("Неудачный старт переговорного процесса по SSL-протоколу.") },
+		{ 10006,	t_("Получен повреждённый пакет.") },
+		{ 10007,	t_("Имелась ошибка сокета.") },
+		{ 10008,	t_("Операция была прервана.") },
+		{ 10009,	t_("Вышло максимальное время на подключения (таймаут).") },
 		// Http CONNECT method error messages.
-		{ 10010,	t_("Http CONNECT method failed.") },
-		{ 10011,	t_("BINDing is not possible in Http tunneling. Consider using Socks protocol.") },
+		{ 10010,	t_("Метод Http CONNECT завершился неудачно.") },
+		{ 10011,	t_("Истользовать BIND при туннелировании Http невозможно. Попробуйте подключение по протоколу Socks.") },
 		// SOCKS4 protocol error messages.
-		{ 91,		t_("Request rejected or failed.") },
-		{ 92,		t_("Request failed. Client is not running identd (or not reachable from the server).") },
-		{ 93,		t_("Request failed. Cilent's identd could not confirm the user ID string in the request.") },
-		{ 94,		t_("Socks4 protocol doesn't support IP version 6 address family. Considers using Socks5 protocol instead.") },
+		{ 91,		t_("Запрос отвергнут или не удался.") },
+		{ 92,		t_("Запрос не удался. На клиенте не запущен identd (или он недоступен с этого сервера).") },
+		{ 93,		t_("Запрос не удался. identd на клиенте не смог подтвердить идентификатор пользователя, указанный в запросе.") },
+		{ 94,		t_("Протокол Socks4 не поддерживает семейство адресов IP версииn 6. Попробуйте вместо него протокол Socks5.") },
 		// SOCKS5 protocol error messages.
-		{ 1,		t_("General failure.") },
-		{ 2,		t_("Connection not allowed by the ruleset.")},
-		{ 3,		t_("Network unreachable.") },
-		{ 4,		t_("Target machine unreachable.") },
-		{ 5,		t_("Connection refused by the destination host.")},
-		{ 6,		t_("TTL expired.") },
-		{ 7,		t_("Command not supported / protocol error.") },
-		{ 8,		t_("Address type not supported.") },
-		{ 255,		t_("Invalid authentication method. No acceptable methods were offered.") },
-		{ 256,		t_("Authentication failed.") },
+		{ 1,		t_("Общая неудача.") },
+		{ 2,		t_("Набор правил запрещает подключение.")},
+		{ 3,		t_("Сеть вне доступа.") },
+		{ 4,		t_("Целевая машина вне доступа.") },
+		{ 5,		t_("Целевой хост отверг подключение.")},
+		{ 6,		t_("Истёк срок TTL.") },
+		{ 7,		t_("Команда не поддерживается / ошибка протокола.") },
+		{ 8,		t_("Тип адреса не поддерживается.") },
+		{ 255,		t_("Неверный метод аутентификации. Приемлемых методов не предложено.") },
+		{ 256,		t_("Провал аутентификации.") },
 	};
 	const Tuple<int, const char *> *x = FindTuple(errors, __countof(errors), code);
 	return x ? x->b : "-1";
@@ -84,7 +84,7 @@ void NetProxy::TraceVerbose(bool b)
 
 bool NetProxy::Init()
 {
-	LLOG("Starting... ");
+	LLOG("Запуск... ");
 	if(!socket)
 		SetError(NO_SOCKET_ATTACHED);
 
@@ -104,7 +104,7 @@ bool NetProxy::Init()
 	start_time = msecs();
 	ipinfo.Start(proxy_host, proxy_port);
 	events = WAIT_READ | WAIT_WRITE;
-	LLOG(Format("Connecting to proxy server: %s:%d", proxy_host, proxy_port));
+	LLOG(Format("Подключение к прокси-серверу: %s:%d", proxy_host, proxy_port));
 	return true;
 }
 
@@ -114,7 +114,7 @@ bool NetProxy::Exit()
 		socket->Timeout(timeout_backup);
 		socket = nullptr;
 		events  = 0;
-		LLOG("Exiting...");
+		LLOG("Выход...");
 	}
 	return true;
 }
@@ -134,7 +134,7 @@ bool NetProxy::Connect()
 	auto b = socket->Connect(ipinfo);
 	if(b) {
 		ipinfo.Clear();
-		LLOG(Format("Successfully connected to proxy server at %s:%d",
+		LLOG(Format("Успешно подключился к прокси-серверу по адресу %s:%d",
 			proxy_host, proxy_port));
 	}
 	return b;
@@ -173,20 +173,20 @@ bool NetProxy::Put()
 
 void NetProxy::PutGet()
 {
-	queue.AddTail() = [=]{ return Put(); };
-	queue.AddTail() = [=]{ return Get(); };
+	queue.AddTail() = [=, this]{ return Put(); };
+	queue.AddTail() = [=, this]{ return Get(); };
 }
 
 void NetProxy::StartSSL()
 {
-	queue.AddTail() = [=]{
+	queue.AddTail() = [=, this]{
 		bool b = socket->StartSSL();
-		if(b) LLOG("SSL negotiation successfully started.");
+		if(b) LLOG("Успешно начались переговоры по SSL.");
 		return b;
 	};
-	queue.AddTail() = [=]{
+	queue.AddTail() = [=, this]{
 		bool b = socket->SSLHandshake();
-		if(!b) LLOG("SSL handshake successful.");
+		if(!b) LLOG("Успешное рукопожатие по SSL.");
 		return !b;
 	};
 }
@@ -198,7 +198,7 @@ void NetProxy::Check()
 	if(IsTimeout())
 		SetError(CONNECTION_TIMED_OUT);
 	if(socket->IsError())
-		throw Error("Socket failure. " + socket->GetErrorDesc());
+		throw Error("Ошибка сокета. " + socket->GetErrorDesc());
 	if(socket->IsAbort())
 		SetError(ABORTED);
 }
@@ -208,17 +208,17 @@ void NetProxy::HttpcConnect()
 {
 	queue.Clear();
 	{
-		IsEof = [=] { return HttpcIsEof(); };
-		queue.AddTail([=]{ return Init();});
-		queue.AddTail([=]{ return Dns(); });
-		queue.AddTail([=]{ return Connect();});
-		queue.AddTail([=]{ return HttpcRequest(); });
+		IsEof = [=, this] { return HttpcIsEof(); };
+		queue.AddTail([=, this]{ return Init();});
+		queue.AddTail([=, this]{ return Dns(); });
+		queue.AddTail([=, this]{ return Connect();});
+		queue.AddTail([=, this]{ return HttpcRequest(); });
 	}
 }
 
 bool NetProxy::HttpcRequest()
 {
-	LLOG("Starting HTTP_CONNECT tunneling...");
+	LLOG("Начало туннелирования HTTP_CONNECT...");
 	packet.Clear();
 	packet_length = 0;
 	int port = Nvl(target_port, ssl ? 443 : 80);
@@ -227,7 +227,7 @@ bool NetProxy::HttpcRequest()
 	if(!proxy_user.IsEmpty() && !proxy_password.IsEmpty())
 		packet << "Proxy-Authorization: Basic " << Base64Encode(proxy_user + ":" + proxy_password) << "\r\n";
     packet << "\r\n";
-	LLOG(">> HTTP_CONNECT: Sending request.");
+	LLOG(">> HTTP_CONNECT: Отправка запроса.");
 	LDUMPHEX(packet);
 	PutGet();
 	return true;
@@ -235,7 +235,7 @@ bool NetProxy::HttpcRequest()
 
 bool NetProxy::HttpcParseReply()
 {
-	LLOG("<< HTTP_CONNECT: Request reply received.");
+	LLOG("<< HTTP_CONNECT: Получен ответ на запрос.");
 	LDUMPHEX(packet);
 	int q = min(packet.Find('\r'), packet.Find('\n'));
 	if(q >= 0)
@@ -247,7 +247,7 @@ bool NetProxy::HttpcParseReply()
 		StartSSL();
 		return true;
 	}
-	LLOG("HTTP_CONNECT: Connection successful.");
+	LLOG("HTTP_CONNECT: Успешное подключение.");
 	return Exit();
 }
 
@@ -264,11 +264,11 @@ bool NetProxy::HttpcIsEof()
 
 bool NetProxy::SocksStart()
 {
-	LLOG(Format("Starting SOCKS%d connection.", proxy_type));
+	LLOG(Format("Старт подключения по SOCKS%d.", proxy_type));
 	packet_type = SOCKS5_HELO;
 	if(!lookup) {
 		ipinfo.Start(target_host, target_port);
-		LLOG(Format("** SOCKS%d: Local name resolving started for %s:%d",
+		LLOG(Format("** SOCKS%d: Началось разрешение локального имени для %s:%d",
 			proxy_type, target_host, target_port));
 	}
 	return true;
@@ -279,23 +279,23 @@ bool NetProxy::SocksCommand(int cmd)
 	switch(cmd) {
 		case BIND:
 			if(!bound) {
-				LLOG("SOCKS" << proxy_type << ": BIND info received.");
+				LLOG("SOCKS" << proxy_type << ":Получена инфо BIND.");
 				bound = true;
 				ParseBoundAddr();
 				packet.Clear();
 				packet_length = 0;
-				queue.AddTail() = [=] { return Get(); };
+				queue.AddTail() = [=, this] { return Get(); };
 				return true;
 			}
-			LLOG("SOCKS" << proxy_type << ": BIND command successful.");
+			LLOG("SOCKS" << proxy_type << ": Команда BIND успешно выполнена.");
 			break;
 		case CONNECT:
 			if(ssl) {
 				StartSSL();
-				LLOG("SOCKS" << proxy_type << ": Starting SSL...");
+				LLOG("SOCKS" << proxy_type << ": Старт SSL...");
 				return true;
 			}
-			LLOG(Format("SOCKS%d: Successfully connected to %s:%d (via proxy %s:%d)",
+			LLOG(Format("SOCKS%d: Успешно подключен к %s:%d (через прокси %s:%d)",
 				proxy_type, target_host, target_port, proxy_host, proxy_port));
 			break;
 		default:
@@ -309,13 +309,13 @@ void NetProxy::Socks4Connect(int cmd)
 	command = (byte) cmd;
 	queue.Clear();
 	{
-		IsEof = [=] { return Socks4IsEof(); };
-		queue.AddTail([=]{ return Init();});
-		queue.AddTail([=]{ return Dns(); });
-		queue.AddTail([=]{ return Connect();});
-		queue.AddTail([=]{ return SocksStart(); });
-		queue.AddTail([=]{ return !lookup ? Dns() : true; });
-		queue.AddTail([=]{ return Socks4Request(); });
+		IsEof = [=, this] { return Socks4IsEof(); };
+		queue.AddTail([=, this]{ return Init();});
+		queue.AddTail([=, this]{ return Dns(); });
+		queue.AddTail([=, this]{ return Connect();});
+		queue.AddTail([=, this]{ return SocksStart(); });
+		queue.AddTail([=, this]{ return !lookup ? Dns() : true; });
+		queue.AddTail([=, this]{ return Socks4Request(); });
 	}
 }
 
@@ -351,7 +351,7 @@ bool NetProxy::Socks4Request()
 			packet.Cat(0x00);
 		}
 	}
-	LLOG(">> SOCKS4: Sending connection request.");
+	LLOG(">> SOCKS4: Отправка запроса на подключение.");
 	LDUMPHEX(packet);
 	PutGet();
 	return true;
@@ -359,7 +359,7 @@ bool NetProxy::Socks4Request()
 
 bool NetProxy::Socks4ParseReply()
 {
-	LLOG("<< SOCKS4: Command request reply received.");
+	LLOG("<< SOCKS4: Получен ответ на запрос.");
 	LDUMPHEX(packet);
 	auto *reply = (Reply::Socks4*) packet.Begin();
 	if(reply->version != 0)
@@ -381,13 +381,13 @@ void NetProxy::Socks5Connect(int cmd)
 	command = (byte) cmd;
 	queue.Clear();
 	{
-		IsEof = [=] { return Socks5IsEof(); };
-		queue.AddTail([=]{ return Init();});
-		queue.AddTail([=]{ return Dns(); });
-		queue.AddTail([=]{ return Connect();});
-		queue.AddTail([=]{ return SocksStart(); });
-		queue.AddTail([=]{ return !lookup ? Dns() : true; });
-		queue.AddTail([=]{ return Socks5Request(); });
+		IsEof = [=, this] { return Socks5IsEof(); };
+		queue.AddTail([=, this]{ return Init();});
+		queue.AddTail([=, this]{ return Dns(); });
+		queue.AddTail([=, this]{ return Connect();});
+		queue.AddTail([=, this]{ return SocksStart(); });
+		queue.AddTail([=, this]{ return !lookup ? Dns() : true; });
+		queue.AddTail([=, this]{ return Socks5Request(); });
 	}
 }
 
@@ -401,7 +401,7 @@ bool NetProxy::Socks5Request()
 		packet.Cat(0x02);
 		packet.Cat(0x00);
 		packet.Cat(0x02);
-		LLOG(">> SOCKS5: Sending initial greetings.");
+		LLOG(">> SOCKS5: Отправка начальных приветствий.");
 	}
 	else
 	if(packet_type == SOCKS5_AUTH) {
@@ -410,7 +410,7 @@ bool NetProxy::Socks5Request()
 		packet.Cat(proxy_user);
 		packet.Cat(proxy_password.GetLength());
 		packet.Cat(proxy_password);
-		LLOG(">> SOCKS5: Sending authorization request.");
+		LLOG(">> SOCKS5: Отправка запроса на авторизацию.");
 	}
 	else
 	if(packet_type == SOCKS5_REQUEST) {
@@ -441,7 +441,7 @@ bool NetProxy::Socks5Request()
 			}
 			ipinfo.Clear();
 		}
-		LLOG(">> SOCKS5: Sending command request.");
+		LLOG(">> SOCKS5: Отправлка командного запроса.");
 	}
 	LDUMPHEX(packet);
 	PutGet();
@@ -451,7 +451,7 @@ bool NetProxy::Socks5Request()
 bool NetProxy::Socks5ParseReply()
 {
 	if(packet_type == SOCKS5_HELO) {
-		LLOG("<< SOCKS5: Server greeting reply recieved.");
+		LLOG("<< SOCKS5: Получен ответ на приветствие сервера.");
 		LDUMPHEX(packet);
 		auto *p = (Reply::Helo*) packet.Begin();
 		if(p->version != 0x05)
@@ -467,7 +467,7 @@ bool NetProxy::Socks5ParseReply()
 	}
 	else
 	if(packet_type == SOCKS5_AUTH) {
-		LLOG("<< SOCKS5: Authorization reply received.");
+		LLOG("<< SOCKS5: Получен ответ по авторизации.");
 		LDUMPHEX(packet);
 		auto *p = (Reply::Auth*) packet.Begin();
 		if(p->version != 0x01)
@@ -479,7 +479,7 @@ bool NetProxy::Socks5ParseReply()
 	}
 	else
 	if(packet_type == SOCKS5_REQUEST) {
-		LLOG("<< SOCKS5: Command request reply received.");
+		LLOG("<< SOCKS5: Получен ответ на командный запрос.");
 		LDUMPHEX(packet);
 		auto *p = (Reply::Socks5*) packet.Begin();
 		if(p->version != 0x05)
@@ -557,7 +557,7 @@ bool NetProxy::Bind(int type, const String& host, int port)
 		default:{
 			String err = GetMsg(HTTPCONNECT_NOBIND);
 			error = MakeTuple<int, String>(10011, err);
-			LLOG("Failed. " << err);
+			LLOG("Неудача. " << err);
 			status = FAILED;
 			return false;
 		}
@@ -580,7 +580,7 @@ bool NetProxy::Do()
 			queue.DropHead();
 		}
 		if(queue.IsEmpty()) {
-			LLOG("Proxy connection is successful.");
+			LLOG("Прокси-подключение успешно.");
 			status = FINISHED;
 			Exit();
 		}
@@ -590,7 +590,7 @@ bool NetProxy::Do()
 		status = FAILED;
 		queue.Clear();
 		error = MakeTuple<int, String>(e.code, e);
-		LLOG("failed. " << e);
+		LLOG("не удалось. " << e);
 		Exit();
 	}
 	return status == WORKING;
@@ -632,8 +632,8 @@ void NetProxy::ParseBoundAddr()
 	};
 	String ip_buffer;
 	if(!NtoP(family, ip, ip_buffer))
-		throw Error(-1, Format("SOCKS%d: Malformed BIND address.", proxy_type));
-	LLOG(Format("SOCKS%d: Bind successful. [%s:%d]", proxy_type, ip_buffer, ntohs(port)));
+		throw Error(-1, Format("SOCKS%d: Неверный адрес BIN.", proxy_type));
+	LLOG(Format("SOCKS%d: Bind успешен. [%s:%d]", proxy_type, ip_buffer, ntohs(port)));
 	WhenBound(ip_buffer, ntohs(port));
 }
 
